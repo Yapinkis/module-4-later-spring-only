@@ -1,31 +1,44 @@
 package ru.practicum.user;
 
-import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Data;
+import org.springframework.stereotype.Repository;
 
-@Component
+import java.util.*;
+
+@Repository
+@Data
 public class UserRepositoryImpl implements UserRepository {
-    private final List<User> users = new ArrayList<>();
+    private Long id = 0L;
+    private Map<Long, User> users = new HashMap<>();
 
     @Override
-    public List<User> findAll() {
-        return users;
+    public UserDTO createUser(User user) {
+        User newUser = new User();
+        newUser.setId(id);
+        newUser.setName(user.getName());
+        newUser.setEmail(user.getEmail());
+        users.put(id++,newUser);
+        return UserMapper.toUserDTO(newUser);
     }
 
     @Override
-    public User save(User user) {
-        user.setId(getId());
-        users.add(user);
-        return user;
+    public UserDTO getUser(Long id) {
+        return UserMapper.toUserDTO(users.get(id));
     }
 
-    private long getId() {
-        long lastId = users.stream()
-                .mapToLong(User::getId)
-                .max()
-                .orElse(0);
-        return lastId + 1;
+    @Override
+    public UserDTO updateUser(User user) {
+        User updatedUser = users.get(user.getId());
+        Optional.ofNullable(user.getId()).ifPresent(updatedUser::setId);
+        Optional.ofNullable(user.getName()).ifPresent(updatedUser::setName);
+        Optional.ofNullable(user.getEmail()).ifPresent(updatedUser::setEmail);
+        return UserMapper.toUserDTO(user);
     }
+
+    @Override
+    public void deleteUser(Long id) {
+        users.remove(id);
+    }
+
 }
