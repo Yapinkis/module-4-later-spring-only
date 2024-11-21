@@ -1,8 +1,11 @@
 package ru.practicum.user;
 
-import java.util.List;
-
 interface UserRepository {
-    List<User> findAll();
-    User save(User user);
+    UserDTO createUser(User user);
+
+    UserDTO getUser(Long id);
+
+    UserDTO updateUser(User user);
+
+    void deleteUser(Long id);
 }
